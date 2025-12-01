@@ -8,13 +8,15 @@
         body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"] { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        input[type="text"], textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        textarea { height: 120px; resize: vertical; }
         button { background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
         button:hover { background-color: #0056b3; }
         button:disabled { background-color: #6c757d; cursor: not-allowed; }
         .result { margin-top: 20px; padding: 10px; border-radius: 4px; }
         .error { background-color: #f8d7da; color: #721c24; }
         .success { background-color: #d4edda; color: #155724; }
+        .jira-example { font-size: 12px; color: #666; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -22,6 +24,30 @@
     <p>Generate custom NVRAM configuration files for your hardware.</p>
     
     <form id="nvramForm">
+        <div class="form-group">
+            <label for="jira_ticket">Jira Ticket (Optional):</label>
+            <input type="text" id="jira_ticket" name="jira_ticket" placeholder="CONNEX-10137">
+            <div class="jira-example">Example: CONNEX-10137, RING-1234, etc.</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="jira_message">Jira Message (Optional):</label>
+            <textarea id="jira_message" name="jira_message" placeholder="CONNEX-10137:Automated CR Creation for RF Testing and Validation[1/1]
+
+[Jira]
+CONNEX-10137
+
+[Problem]
+Modification of nvram config need validation
+
+[Solution]
+Run PreCI to test DTS
+
+[Test]
+DTS Pass"></textarea>
+            <div class="jira-example">Include your full Jira ticket description and test details</div>
+        </div>
+        
         <div class="form-group">
             <label for="macaddr">MAC Address:</label>
             <input type="text" id="macaddr" name="macaddr" placeholder="00:11:22:33:44:55">
@@ -80,7 +106,9 @@
                     resultDiv.innerHTML = `
                         <strong>✅ Success!</strong><br><br>
                         <strong>Configuration uploaded successfully!</strong><br>
-                        File: ${result.filename}<br><br>
+                        File: ${result.filename}<br>
+                        ${result.jira_ticket ? `<strong>Jira Ticket:</strong> ${result.jira_ticket}<br>` : ''}
+                        <br>
                         <strong>Parameters used:</strong><br>
                         <pre>${JSON.stringify(result.parameters, null, 2)}</pre>
                         <br>
