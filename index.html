@@ -25,12 +25,6 @@
     
     <form id="nvramForm">
         <div class="form-group">
-            <label for="jira_ticket">Jira Ticket (Optional):</label>
-            <input type="text" id="jira_ticket" name="jira_ticket" placeholder="CONNEX-10137">
-            <div class="jira-example">Example: CONNEX-10137, RING-1234, etc.</div>
-        </div>
-        
-        <div class="form-group">
             <label for="jira_message">Jira Message (Optional):</label>
             <textarea id="jira_message" name="jira_message" placeholder="CONNEX-10137:Automated CR Creation for RF Testing and Validation[1/1]
 
@@ -107,7 +101,6 @@ DTS Pass"></textarea>
                         <strong>✅ Success!</strong><br><br>
                         <strong>Configuration uploaded successfully!</strong><br>
                         File: ${result.filename}<br>
-                        ${result.jira_ticket ? `<strong>Jira Ticket:</strong> ${result.jira_ticket}<br>` : ''}
                         <br>
                         <strong>Parameters used:</strong><br>
                         <pre>${JSON.stringify(result.parameters, null, 2)}</pre>
