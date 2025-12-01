@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NVRAM Configuration Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"] { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #6c757d; cursor: not-allowed; }
+        .result { margin-top: 20px; padding: 10px; border-radius: 4px; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .success { background-color: #d4edda; color: #155724; }
+    </style>
+</head>
+<body>
+    <h1>NVRAM Configuration Generator</h1>
+    <p>Generate custom NVRAM configuration files for your hardware.</p>
+    
+    <form id="nvramForm">
+        <div class="form-group">
+            <label for="macaddr">MAC Address:</label>
+            <input type="text" id="macaddr" name="macaddr" placeholder="00:11:22:33:44:55">
+            <small>Format: XX:XX:XX:XX:XX:XX (leave empty for default)</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="boardnum">Board Number:</label>
+            <input type="text" id="boardnum" name="boardnum" placeholder="99">
+            <small>Numeric value (leave empty for default)</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="ccode">Country Code:</label>
+            <input type="text" id="ccode" name="ccode" placeholder="US" maxlength="2">
+            <small>2-letter country code (leave empty for default)</small>
+        </div>
+        
+        <button type="submit" id="submitBtn">Generate & Upload Configuration</button>
+    </form>
+    
+    <div id="result" style="display: none;"></div>
+
+    <script>
+        // API Gateway URL
+        const API_URL = 'https://7wrxhw8i7f.execute-api.us-east-1.amazonaws.com/prod/upload';
+        
+        document.getElementById('nvramForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const resultDiv = document.getElementById('result');
+            
+            // Disable button and show loading
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Uploading...';
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = 'Processing your configuration...';
+            resultDiv.className = 'result';
+            
+            try {
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <strong>✅ Success!</strong><br><br>
+                        <strong>Configuration uploaded successfully!</strong><br>
+                        File: ${result.filename}<br><br>
+                        <strong>Parameters used:</strong><br>
+                        <pre>${JSON.stringify(result.parameters, null, 2)}</pre>
+                        <br>
+                        Your NVRAM configuration file will be generated automatically and available for download shortly.
+                    `;
+                    resultDiv.className = 'result success';
+                    
+                    // Reset form
+                    e.target.reset();
+                } else {
+                    throw new Error(result.error || 'Upload failed');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = `
+                    <strong>❌ Error:</strong><br>
+                    ${error.message}<br><br>
+                    Please check your input and try again.
+                `;
+                resultDiv.className = 'result error';
+            } finally {
+                // Re-enable button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Generate & Upload Configuration';
+            }
+        });
+    </script>
+</body>
+</html>
