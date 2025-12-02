@@ -65,9 +65,14 @@ DTS Pass"></textarea>
     
     <div id="result" style="display: none;"></div>
 
+    <!-- Load configuration (not committed to GitHub) -->
+    <script src="config.js"></script>
+    
     <script>
-        // API Gateway URL
-        const API_URL = 'https://7wrxhw8i7f.execute-api.us-east-1.amazonaws.com/prod/upload';
+        // API Gateway URL - Load from environment or config
+        const API_URL = window.CONFIG?.API_GATEWAY_URL || 
+                       process.env.API_GATEWAY_URL || 
+                       'https://your-api-endpoint.com/prod/upload';
         
         document.getElementById('nvramForm').addEventListener('submit', async function(e) {
             e.preventDefault();
